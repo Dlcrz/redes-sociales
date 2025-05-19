@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "redes-sociales-client-side-solution",
+    "id": "251eb255-d7f9-4ae4-a555-f421b950e096",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "redes-sociales description"
+      },
+      "longDescription": {
+        "default": "redes-sociales description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "redes-sociales Feature",
+        "description": "The feature that activates elements of the redes-sociales solution.",
+        "id": "229621f2-bcd8-4b7f-bacf-f8c505fa1181",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/redes-sociales.sppkg"
+  }
+}
