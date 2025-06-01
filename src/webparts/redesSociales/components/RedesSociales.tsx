@@ -1,43 +1,84 @@
 import * as React from 'react';
+import { IRedSocialElemento } from './IRedSocialElemento';
+import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import styles from './RedesSociales.module.scss';
-import type { IRedesSocialesProps } from './IRedesSocialesProps';
-import { escape } from '@microsoft/sp-lodash-subset';
 
-export default class RedesSociales extends React.Component<IRedesSocialesProps, {}> {
-  public render(): React.ReactElement<IRedesSocialesProps> {
-    const {
-      description,
-      isDarkTheme,
-      environmentMessage,
-      hasTeamsContext,
-      userDisplayName
-    } = this.props;
+export interface IRedesSocialesProps {
+  siteUrl: string;
+  spHttpClient: SPHttpClient;
+}
 
+export interface IRedesSocialesState {
+  items: (IRedSocialElemento & { IconoURL?: string })[];
+}
+
+export default class RedesSociales extends React.Component<IRedesSocialesProps, IRedesSocialesState> {
+  constructor(props: IRedesSocialesProps) {
+    super(props);
+    this.state = {
+      items: []
+    };
+  }
+
+  public componentDidMount(): void {
+    this._loadItems();
+  }
+
+  private _loadItems(): void {
+    const url = `${this.props.siteUrl}/_api/web/lists/getbytitle('Redes Sociales')/items?$select=ID,Title,Link,Icono`;
+
+    this.props.spHttpClient.get(url, SPHttpClient.configurations.v1, {
+      headers: { Accept: 'application/json' }
+    })
+      .then((response: SPHttpClientResponse) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then((data: { value: IRedSocialElemento[] }) => {
+        const itemsProcesados = data.value.map(item => {
+          let iconoUrl = '';
+          try {
+            const iconoData = JSON.parse((item as any).Icono);
+            iconoUrl = `${this.props.siteUrl}/Lists/Redes%20Sociales/Attachments/${item.ID}/${iconoData.fileName}`;
+          } catch (e) {
+            console.warn('❗ No se pudo parsear Icono:', item.Icono);
+          }
+
+          return {
+            ...item,
+            IconoURL: iconoUrl
+          };
+        });
+
+        this.setState({ items: itemsProcesados });
+      })
+      .catch(error => {
+        console.error('❌ Error al cargar redes sociales:', error);
+      });
+  }
+
+  public render(): React.ReactElement<IRedSocialElemento> {
     return (
-      <section className={`${styles.redesSociales} ${hasTeamsContext ? styles.teams : ''}`}>
-        <div className={styles.welcome}>
-          <img alt="" src={isDarkTheme ? require('../assets/welcome-dark.png') : require('../assets/welcome-light.png')} className={styles.welcomeImage} />
-          <h2>Well done, {escape(userDisplayName)}!</h2>
-          <div>{environmentMessage}</div>
-          <div>Web part property value: <strong>{escape(description)}</strong></div>
-        </div>
-        <div>
-          <h3>Welcome to SharePoint Framework!</h3>
-          <p>
-            The SharePoint Framework (SPFx) is a extensibility model for Microsoft Viva, Microsoft Teams and SharePoint. It&#39;s the easiest way to extend Microsoft 365 with automatic Single Sign On, automatic hosting and industry standard tooling.
-          </p>
-          <h4>Learn more about SPFx development:</h4>
-          <ul className={styles.links}>
-            <li><a href="https://aka.ms/spfx" target="_blank" rel="noreferrer">SharePoint Framework Overview</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-graph" target="_blank" rel="noreferrer">Use Microsoft Graph in your solution</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-teams" target="_blank" rel="noreferrer">Build for Microsoft Teams using SharePoint Framework</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-viva" target="_blank" rel="noreferrer">Build for Microsoft Viva Connections using SharePoint Framework</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-store" target="_blank" rel="noreferrer">Publish SharePoint Framework applications to the marketplace</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-api" target="_blank" rel="noreferrer">SharePoint Framework API reference</a></li>
-            <li><a href="https://aka.ms/m365pnp" target="_blank" rel="noreferrer">Microsoft 365 Developer Community</a></li>
-          </ul>
-        </div>
-      </section>
+      <div className={styles.socialBar}>
+        {this.state.items.map((item, index) => (
+          <a
+            key={index}
+            href={item.Link?.Url ?? '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.iconLink}
+            title={item.Title}
+          >
+            {item.IconoURL && (
+              <img
+                src={item.IconoURL}
+                alt={item.Title}
+                className={styles.iconImage}
+              />
+            )}
+          </a>
+        ))}
+      </div>
     );
   }
 }

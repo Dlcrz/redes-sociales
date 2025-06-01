@@ -1,34 +1,20 @@
-@import '~@fluentui/react/dist/sass/References.scss';
-
-.redesSociales {
-  overflow: hidden;
-  padding: 1em;
-  color: "[theme:bodyText, default: #323130]";
-  color: var(--bodyText);
-  &.teams {
-    font-family: $ms-font-family-fallbacks;
-  }
+.socialBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  background-color: #e5e5e5;
+  padding: 10px 20px;
 }
 
-.welcome {
-  text-align: center;
+.iconLink {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
 }
 
-.welcomeImage {
+.iconImage {
   width: 100%;
-  max-width: 420px;
-}
-
-.links {
-  a {
-    text-decoration: none;
-    color: "[theme:link, default:#03787c]";
-    color: var(--link); // note: CSS Custom Properties support is limited to modern browsers only
-
-    &:hover {
-      text-decoration: underline;
-      color: "[theme:linkHovered, default: #014446]";
-      color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
-    }
-  }
+  height: auto;
+  border-radius: 50%;
+  object-fit: contain;
 }
